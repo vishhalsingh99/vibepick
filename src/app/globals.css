@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@theme {
+  /* Brand Colors */
+  --color-vibe-orange: #FF6B00;
+  --color-vibe-charcoal: #1A1A1A;
+  
+  /* UI Colors */
+  --color-vibe-text: #333333;
+  --color-vibe-surface: #F4F4F4;
+  --color-vibe-border: #E0E0E0;
+  
+  /* Status Colors */
+  --color-status-success: #27AE60;
+  --color-status-error: #EB5757;
+}
