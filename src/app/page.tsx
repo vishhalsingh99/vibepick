@@ -1,9 +1,14 @@
-import Image from "next/image";
+import { auth } from '@/auth';
+import Features from '@/components/Features';
+import HeroSection from '@/components/HeroSection';
 
-export default function Home() {
+export default async function HomePage() {
+  const session = await auth();
+
   return (
-    <div>
-     hello
+    <div className="min-h-[calc(100vh-5rem)] text-white">
+      <HeroSection isLoggedIn={!!session}  />
+      <Features />
     </div>
   );
 }

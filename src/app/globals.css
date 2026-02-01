@@ -1,16 +1,78 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   /* Brand Colors */
-  --color-vibe-orange: #FF6B00;
-  --color-vibe-charcoal: #1A1A1A;
-  
+  --color-vibe-orange: #ff6b00;
+  --color-vibe-charcoal: #1a1a1a;
+
   /* UI Colors */
   --color-vibe-text: #333333;
-  --color-vibe-surface: #F4F4F4;
-  --color-vibe-border: #E0E0E0;
-  
+  --color-vibe-surface: #f4f4f4;
+  --color-vibe-border: #e0e0e0;
+
   /* Status Colors */
-  --color-status-success: #27AE60;
-  --color-status-error: #EB5757;
+  --color-status-success: #27ae60;
+  --color-status-error: #eb5757;
+
+  /* ===========================
+     Brand Colors
+  ============================ */
+  --color-vibe-primary: #ff6b00;
+  --color-vibe-primary-hover: #e65f00;
+  --color-vibe-primary-soft: #fff1e6;
+
+  --color-vibe-charcoal: #1a1a1a;
+
+  /* ===========================
+     Backgrounds & Surfaces
+  ============================ */
+  --color-vibe-bg: #fafafa;
+  --color-vibe-surface: #ffffff;
+  --color-vibe-surface-muted: #f4f4f4;
+  --color-vibe-surface-hover: #efefef;
+
+  /* ===========================
+     Text Colors
+  ============================ */
+  --color-vibe-text-primary: #1a1a1a;
+  --color-vibe-text-secondary: #4f4f4f;
+  --color-vibe-text-muted: #828282;
+  --color-vibe-text-inverse: #ffffff;
+
+  /* ===========================
+     Borders & Dividers
+  ============================ */
+  --color-vibe-border: #e0e0e0;
+  --color-vibe-border-strong: #cfcfcf;
+
+  /* ===========================
+     Status Colors
+  ============================ */
+  --color-status-success: #27ae60;
+  --color-status-success-soft: #eaf7f0;
+
+  --color-status-error: #eb5757;
+  --color-status-error-soft: #fdecec;
+
+  --color-status-warning: #f2994a;
+  --color-status-warning-soft: #fff4e5;
+
+  /* ===========================
+     Focus & Ring
+  ============================ */
+  --color-vibe-ring: #ff6b004d;
+}
+
+@layer components {
+  .input {
+    @apply w-full 
+    rounded-2xl
+                  bg-white/5
+                  border border-white/10
+                  px-4 py-3 pr-12
+                  text-white
+                  placeholder:text-white/30
+                  focus:outline-none
+                  focus:ring-2 focus:ring-vibe-orange/40;
+  }
 }
