@@ -20,7 +20,7 @@ type Props = {
     name: string;
     email: string;
     mobile?: string;
-    role: 'user' | 'deliveryBoy';
+    role: 'user' | 'deliveryBoy' | 'admin';   // ← added 'admin' to union
   };
 };
 
@@ -29,10 +29,12 @@ export default function ProfileClient({ user }: Props) {
   const [form, setForm] = useState({
     name: user.name,
     mobile: user.mobile || '',
-    role: user.role,
+    role: user.role,           // keep it, but we won't let admin change it
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const isAdmin = user.role === 'admin';
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -42,7 +44,13 @@ export default function ProfileClient({ user }: Props) {
     try {
       setLoading(true);
       setError('');
-      await axios.patch('/api/user/update', form);
+
+      // Never send role if user is admin (extra safety)
+      const payload = isAdmin
+        ? { name: form.name, mobile: form.mobile }
+        : form;
+
+      await axios.patch('/api/user/update', payload);
       setEditing(false);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Something went wrong');
@@ -50,6 +58,12 @@ export default function ProfileClient({ user }: Props) {
       setLoading(false);
     }
   }
+
+  // Human-friendly role display
+  const displayRole =
+    form.role === 'deliveryBoy' ? 'Delivery Boy' :
+    form.role === 'admin'       ? 'Admin' :
+    /* else */                    'User';
 
   return (
     <div
@@ -89,23 +103,21 @@ export default function ProfileClient({ user }: Props) {
 
           <div className="flex gap-2">
             {!editing ? (
-              <>
-                <button
-                  onClick={() => setEditing(true)}
-                  className="
-                    flex items-center gap-2
-                    px-4 py-2
-                    rounded-xl
-                    bg-white/10
-                    hover:bg-orange-500
-                    transition
-                    text-sm
-                  "
-                >
-                  <Pencil size={16} />
-                  Edit
-                </button>
-              </>
+              <button
+                onClick={() => setEditing(true)}
+                className="
+                  flex items-center gap-2
+                  px-4 py-2
+                  rounded-xl
+                  bg-white/10
+                  hover:bg-orange-500
+                  transition
+                  text-sm
+                "
+              >
+                <Pencil size={16} />
+                Edit
+              </button>
             ) : (
               <>
                 <button
@@ -177,30 +189,26 @@ export default function ProfileClient({ user }: Props) {
             />
           </Field>
 
-          {/* ROLE (NOW SAME LOOK) */}
+          {/* ROLE – different rendering for admin */}
           <Field
             label="Role"
-            icon={(!editing ? <ShieldCheck className='text-orange-400' /> : <ShieldCheck className='hidden'/>)}
+            icon={<ShieldCheck className="text-orange-400" />}
           >
-            {!editing ? (
+            {isAdmin ? (
+              // Admin sees fixed read-only value (even in edit mode)
               <input
                 disabled
-                value={
-                  form.role === 'deliveryBoy'
-                    ? 'Delivery Boy'
-                    : 'User'
-                }
+                value="Admin"
                 className={inputClass(false)}
               />
-            ) : (
+            ) : editing ? (
+              // Normal users & delivery boys can select role
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 {(['user', 'deliveryBoy'] as const).map((r) => (
                   <button
                     key={r}
                     type="button"
-                    onClick={() =>
-                      setForm({ ...form, role: r })
-                    }
+                    onClick={() => setForm({ ...form, role: r })}
                     className={`
                       rounded-xl border p-4
                       transition
@@ -211,22 +219,24 @@ export default function ProfileClient({ user }: Props) {
                       }
                     `}
                   >
-                    
                     <p className="text-sm font-bold uppercase">
-                      {r === 'deliveryBoy'
-                        ? 'Delivery Boy'
-                        : 'User'}
+                      {r === 'deliveryBoy' ? 'Delivery Boy' : 'User'}
                     </p>
                   </button>
                 ))}
               </div>
+            ) : (
+              // View mode – display friendly name
+              <input
+                disabled
+                value={displayRole}
+                className={inputClass(false)}
+              />
             )}
           </Field>
 
           {error && (
-            <p className="text-red-400 text-sm">
-              {error}
-            </p>
+            <p className="text-red-400 text-sm">{error}</p>
           )}
         </div>
       </motion.div>

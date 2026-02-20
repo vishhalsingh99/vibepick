@@ -5,19 +5,35 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, LayoutDashboard, Menu, Search, X } from "lucide-react";
+import { User, LayoutDashboard, Menu, Search, X, PackagePlus, ClipboardList } from "lucide-react";
 import Logo from "./Logo";
 import LogoutButton from "./LogoutButton";
 
 export default function Navbar() {
   const pathname = usePathname();
   const { data: session } = useSession();
-  const user = session?.user;
+  const user = session?.user as { name?: string; role?: 'user' | 'deliveryBoy' | 'admin' } | null;
 
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const isActive = (path: string) => pathname === path;
+  const isActive = (path: string) => pathname === path || pathname.startsWith(path);
+
+  const isAdmin = user?.role === "admin";
+  const isDeliveryBoy = user?.role === "deliveryBoy";
+
+  // Links for regular users & delivery boys
+  const publicLinks = [
+    { href: "/explore", label: "Explore" },
+    { href: "/trending", label: "Trending" },
+    { href: "/about", label: "About" },
+  ];
+
+  // Links exclusive to admin
+  const adminLinks = [
+    { href: "/admin/manage-orders", label: "Manage Orders", icon: <ClipboardList className="h-5 w-5" /> },
+    { href: "/admin/add-grocery", label: "Add Grocery", icon: <PackagePlus className="h-5 w-5" /> },
+  ];
 
   return (
     <>
@@ -25,36 +41,48 @@ export default function Navbar() {
       <nav className="fixed top-0 z-50 w-full border-b border-white/10 bg-black/70 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           
-          {/* Logo - always visible */}
+          {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 shrink-0">
             <Logo />
           </Link>
 
-          {/* Desktop view: only from 1000px and above */}
+          {/* Desktop view: ≥ 1000px */}
           <div className="hidden min-[1000px]:flex items-center gap-4 lg:gap-6">
-            {/* Navigation Links */}
+            {/* Navigation Links – role-based */}
             <div className="flex gap-5 text-sm font-medium text-white/80">
-              <Link
-                href="/explore"
-                className={`hover:text-vibe-orange transition-colors ${isActive("/explore") ? "text-vibe-orange" : ""}`}
-              >
-                Explore
-              </Link>
-              <Link
-                href="/trending"
-                className={`hover:text-vibe-orange transition-colors ${isActive("/trending") ? "text-vibe-orange" : ""}`}
-              >
-                Trending
-              </Link>
-              <Link
-                href="/about"
-                className={`hover:text-vibe-orange transition-colors ${isActive("/about") ? "text-vibe-orange" : ""}`}
-              >
-                About
-              </Link>
+              {isAdmin ? (
+                <>
+                  {adminLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={`flex items-center gap-2 hover:text-vibe-orange transition-colors ${
+                        isActive(link.href) ? "text-vibe-orange" : ""
+                      }`}
+                    >
+                      {link.icon}
+                      {link.label}
+                    </Link>
+                  ))}
+                </>
+              ) : (
+                <>
+                  {publicLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={`hover:text-vibe-orange transition-colors ${
+                        isActive(link.href) ? "text-vibe-orange" : ""
+                      }`}
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </>
+              )}
             </div>
 
-            {/* Search Bar */}
+            {/* Search Bar (visible to all) */}
             <form action="/search" className="relative min-w-[200px] max-w-[260px] flex-1">
               <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/50" />
               <input
@@ -79,11 +107,11 @@ export default function Navbar() {
                   <div className="h-7 w-7 rounded-full bg-vibe-orange/20 flex items-center justify-center">
                     <User className="h-4 w-4 text-vibe-orange" />
                   </div>
-                  <span className="font-medium">{user.name?.split(" ")[0]}</span>
+                  <span className="font-medium">{user.name?.split(" ")[0] || "User"}</span>
                 </Link>
 
                 <Link
-                  href="/dashboard"
+                  href={isAdmin ? "/admin/dashboard" : "/dashboard"}
                   className="rounded-lg p-2.5 text-white/70 hover:bg-white/10 transition"
                 >
                   <LayoutDashboard className="h-5 w-5" />
@@ -111,17 +139,19 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile Icons: visible below 1000px */}
+          {/* Mobile Icons (below 1000px) */}
           <div className="flex items-center gap-2 min-[1000px]:hidden">
             <button
               onClick={() => setMobileSearchOpen(true)}
               className="rounded-lg p-2.5 hover:bg-white/10 transition"
+              aria-label="Open search"
             >
               <Search className="h-5 w-5 text-white/90" />
             </button>
             <button
               onClick={() => setMobileMenuOpen(true)}
               className="rounded-lg p-2.5 hover:bg-white/10 transition"
+              aria-label="Open menu"
             >
               <Menu className="h-6 w-6 text-white/90" />
             </button>
@@ -150,6 +180,7 @@ export default function Navbar() {
               <button
                 onClick={() => setMobileSearchOpen(false)}
                 className="p-3 rounded-xl hover:bg-white/10"
+                aria-label="Close search"
               >
                 <X className="h-6 w-6 text-white/90" />
               </button>
@@ -166,36 +197,91 @@ export default function Navbar() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 180 }}
-            className="fixed inset-0 z-[70] bg-black/95 backdrop-blur-xl p-6 min-[1000px]:hidden"
+            className="fixed inset-0 z-[70] bg-black/95 backdrop-blur-xl p-6 min-[1000px]:hidden overflow-y-auto"
           >
             <div className="flex justify-between items-center mb-8">
               <Logo />
               <button
                 onClick={() => setMobileMenuOpen(false)}
                 className="p-2 rounded-lg hover:bg-white/10"
+                aria-label="Close menu"
               >
                 <X className="h-7 w-7 text-white/90" />
               </button>
             </div>
 
             <div className="flex flex-col gap-6 text-lg font-medium text-white/90">
-              <Link href="/explore" className="hover:text-vibe-orange transition-colors">Explore</Link>
-              <Link href="/trending" className="hover:text-vibe-orange transition-colors">Trending</Link>
-              <Link href="/about" className="hover:text-vibe-orange transition-colors">About</Link>
+              {/* Role-based mobile links */}
+              {isAdmin ? (
+                <>
+                  {adminLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={`flex items-center gap-3 hover:text-vibe-orange transition-colors ${
+                        isActive(link.href) ? "text-vibe-orange" : ""
+                      }`}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {link.icon}
+                      {link.label}
+                    </Link>
+                  ))}
+                </>
+              ) : (
+                <>
+                  {publicLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={`hover:text-vibe-orange transition-colors ${
+                        isActive(link.href) ? "text-vibe-orange" : ""
+                      }`}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </>
+              )}
 
               <div className="mt-10 pt-6 border-t border-white/10">
                 {user ? (
                   <div className="flex flex-col gap-6">
-                    <Link href="/profile" className="hover:text-vibe-orange transition-colors">Profile</Link>
-                    <Link href="/dashboard" className="hover:text-vibe-orange transition-colors">Dashboard</Link>
+                    <Link
+                      href="/profile"
+                      className="hover:text-vibe-orange transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Profile
+                    </Link>
+                    <Link
+                      href={isAdmin ? "/admin/dashboard" : "/dashboard"}
+                      className="hover:text-vibe-orange transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Dashboard
+                    </Link>
                     <div className="pt-3">
                       <LogoutButton />
                     </div>
                   </div>
                 ) : (
                   <div className="flex flex-col gap-5">
-                    <Link href="/login" className="hover:text-vibe-orange transition-colors">Sign In</Link>
-                    <Link href="/register" className="hover:text-vibe-orange transition-colors">Join</Link>
+                    <Link
+                      href="/login"
+                      className="hover:text-vibe-orange transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Sign In
+                    </Link>
+                    <Link
+                      href="/register"
+                      className="hover:text-vibe-orange transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Join
+                    </Link>
                   </div>
                 )}
               </div>
@@ -204,7 +290,7 @@ export default function Navbar() {
         )}
       </AnimatePresence>
 
-      {/* Spacer to prevent content from hiding under fixed navbar */}
+      {/* Spacer */}
       <div className="h-16" />
     </>
   );

@@ -1,7 +1,7 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
-import { connectDb } from './lib/db';
-import User from './models/user.model';
+import { connectDb } from './src/lib/db';
+import User from './src/models/user.model';
 import bcrypt from 'bcryptjs';
 import { JWT } from 'next-auth/jwt';
 import Google from 'next-auth/providers/google';
@@ -53,7 +53,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
-    async signIn({ user, account}) {
+    async signIn({ user, account }) {
       if (account?.provider === 'google') {
         await connectDb();
 

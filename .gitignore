@@ -11,7 +11,9 @@
 !.yarn/versions
 
 # testing
+
 /coverage
+/*******  9afabf70-ec12-4429-86c9-9fd27f0c59c6  *******/
 
 # next.js
 /.next/
@@ -20,6 +22,9 @@
 # production
 /build
 
+# static site generator
+.next-sitemap.xml
+/*******  e276d2c2-4ac9-4446-8d3b-b2d0ad94518c  *******/
 # misc
 .DS_Store
 *.pem

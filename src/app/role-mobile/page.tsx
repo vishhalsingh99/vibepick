@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-import { auth } from '@/auth';
+import { auth } from '../../../auth';
 import { redirect } from 'next/navigation';
 import { connectDb } from '@/lib/db';
 import User from '@/models/user.model';

@@ -32,6 +32,7 @@ export const connectDb = async () => {
         const conn = await cached.promise;
         return conn
     } catch (error) {
-        
+        console.error("MongoDb connection error", error)
+        throw error;
     }
 }
