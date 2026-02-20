@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '../../auth';
 import { updateProfileService } from '@/services/updateProfile.service';
+import { logger } from '@/lib/logger';
 
 export async function editRoleMobileController(req: NextRequest) {
   try {
@@ -27,7 +28,7 @@ export async function editRoleMobileController(req: NextRequest) {
       { status: 200 },
     );
   } catch (error) {
-    console.error('Edit role/mobile controller error:', error);
+    logger.error('Edit role/mobile controller error:', error);
     return NextResponse.json(
       { message: 'Internal server error' },
       { status: 500 },

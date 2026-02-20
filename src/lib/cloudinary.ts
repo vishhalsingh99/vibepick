@@ -1,4 +1,5 @@
 import { v2 as cloudinary } from 'cloudinary';
+import { logger } from './logger';
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -27,7 +28,7 @@ const uploadOnCloudinary = async (file: Blob): Promise<string | null> => {
       uploadStream.end(buffer);
     });
   } catch (error) {
-    console.log(error);
+    logger.log(error);
     return null;
   }
 };

@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addGrocerySchema, AddGrocerySchemaType } from "@/schema/add-grocery.schema";
 import axios from "axios";
+import { logger } from "@/lib/logger";
 
 interface AddGroceryFormProps {
   onSuccess?: () => void;
@@ -61,7 +62,7 @@ export default function AddGroceryForm({ onSuccess }: AddGroceryFormProps = {}) 
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      console.log("Backend response:", res.data); // testing ke liye
+      logger.log("Backend response:", res.data); // testing ke liye
 
       setSuccessMessage("Grocery item successfully add ho gaya!");
       reset();

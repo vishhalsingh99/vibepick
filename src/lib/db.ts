@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { logger } from "./logger";
 
 
 const mongodbUrl = process.env.MONGODB_URL;
@@ -23,7 +24,7 @@ export const connectDb = async () => {
         cached.promise = mongoose.connect(mongodbUrl)
         .then((conn) => conn.connection)
         .catch((err) => {
-            console.error("MongoDb connection error", err)
+            logger.error("MongoDb connection error", err)
         throw err;
     })
     }
@@ -32,7 +33,7 @@ export const connectDb = async () => {
         const conn = await cached.promise;
         return conn
     } catch (error) {
-        console.error("MongoDb connection error", error)
+        logger.error("MongoDb connection error", error)
         throw error;
     }
 }

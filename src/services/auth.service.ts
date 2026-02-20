@@ -2,6 +2,7 @@ import { connectDb } from '@/lib/db';
 import { getUserByEmail, createUser } from '@/repositories/user.repo';
 import hashPassword from '@/lib/hash';
 import {RegisterSchemaType, registerUserSchema } from '@/schema/auth.schema';
+import { logger } from '@/lib/logger';
 
 
 export async function registerService(data: RegisterSchemaType) {
@@ -41,7 +42,7 @@ export async function registerService(data: RegisterSchemaType) {
         }
     };
   } catch (err) {
-    console.error("Register Service Error:", err);
+    logger.error("Register Service Error:", err);
     return {status: 500, message: "Internal Server Error"};
   }
 }

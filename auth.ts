@@ -5,6 +5,7 @@ import User from './src/models/user.model';
 import bcrypt from 'bcryptjs';
 import { JWT } from 'next-auth/jwt';
 import Google from 'next-auth/providers/google';
+import { logger } from '@/lib/logger';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -42,7 +43,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             role: user.role,
           };
         } catch (error) {
-          console.error('Auth error:', error);
+          logger.error('Auth error:', error);
           return null;
         }
       },
@@ -100,8 +101,3 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   secret: process.env.AUTH_SECRET,
 });
-
-//connect db
-// check email
-// password match
-// return user

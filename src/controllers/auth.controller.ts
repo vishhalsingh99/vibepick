@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { registerService } from '@/services/auth.service';
 import { getErrorMessage } from '@/utils/getErrorMessage';
 import { NextRequest, NextResponse } from 'next/server';
@@ -12,7 +13,7 @@ export async function registerController(req: NextRequest) {
       { status: 201 },
     );
   } catch (error: unknown) {
-    console.error('Register Controller Error:', error);
+    logger.error('Register Controller Error:', error);
     const message = getErrorMessage(error);
     return NextResponse.json({ message }, { status: 500 });
   }
